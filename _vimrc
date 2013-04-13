@@ -18,6 +18,7 @@ colorscheme solarized
 
 map ; :
 map <S-Space> <Leader>
+nmap <Leader>/ :NERDTreeToggle<CR>
 
 " manip vimrc
 "silent map <Leader>ev :e d:\utilities\vim\_vimrc<CR>
