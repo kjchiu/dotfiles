@@ -17,6 +17,7 @@ set background=dark
 colorscheme solarized
 
 
+nmap <C-V> "+gP
 map ; :
 map <S-Space> <Leader>
 
