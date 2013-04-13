@@ -12,6 +12,7 @@ set nowrap
 
 syntax on
 filetype on
+set guifont=Consolas:h10:cANSI
 set background=dark
 colorscheme solarized
 
@@ -20,8 +21,8 @@ map ; :
 map <S-Space> <Leader>
 
 " manip vimrc
-"silent map <Leader>ev :e d:\utilities\vim\_vimrc<CR>
-"silent map <Leader>sv :source d:\utilities\vim\_vimrc<CR>
+silent map <Leader>ev :e d:\utilities\vim\_vimrc<CR>
+silent map <Leader>sv :source d:\utilities\vim\_vimrc<CR>
 
 set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp
 "CtrlP
