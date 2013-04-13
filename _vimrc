@@ -10,6 +10,11 @@ set smartindent
 set wmh=0
 set nowrap
 
+set backspace=indent,eol,start
+
+set incsearch
+set hlsearch
+
 syntax on
 filetype on
 set guifont=Consolas:h10:cANSI
@@ -37,3 +42,4 @@ let g:ctrlp_custom_ignore={
 " vim: set ft=vim :
 set nobackup
 set nowritebackup
+set noswapfile
