@@ -1,5 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
-let g:netrw_dirhist_1='/Users/kchiu/src/Tiny-Kingdom/client/js/thor'
-let g:netrw_dirhist_2='/Users/kchiu/src/BrousForce/server'
-let g:netrw_dirhist_3='/Users/kchiu/src/Tiny-Kingdom/client/js/thor'
