@@ -8,6 +8,7 @@ Plugin 'Lokaltog/vim-easymotion'
 Plugin 'bling/vim-airline'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'terryma/vim-multiple-cursors'
+Plugin 'tpope/vim-surround'
 
 " file stuff
 Plugin 'tpope/vim-vinegar' " netrw wrapper
@@ -29,6 +30,14 @@ Plugin 'altercation/vim-colors-solarized'
 Plugin 'tomasr/molokai'
 Plugin 'noahfrederick/vim-hemisu'
 Plugin 'queyenth/oxeded.vim'
+
+" omnisharp + deps
+Plugin 'tpope/vim-dispatch'
+Plugin 'scrooloose/syntastic'
+Plugin 'Omnisharp/omnisharp-vim'
+
+Plugin 'Shougo/neocomplete.vim'
+
 call vundle#end()
 filetype plugin indent on
 
@@ -87,8 +96,6 @@ nmap <Leader>p "_p
 imap <C-CR> <C-o>A;<C-c>:s/\([,{]\);$/\1/e<CR>:s/;\+$/;/e<CR>o
 nmap <C-CR> A;<C-c>:s/\([,{]\);$/\1/e<CR>:s/;\+$/;/e<CR>o<C-c>
 
-"asdf,
-
 " toggle visible whitespace
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 nmap <Leader>w :set list!<CR>
@@ -99,7 +106,7 @@ silent map <Leader>sv :source ~/.vimrc<CR>
 
 nmap <Leader>bd :bd *<C-a><CR>
 
-set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp
+set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp,*.*.meta,*/Temp/*
 if has('gui_running')
 	set guifont=Consolas:h14,Sauce\ Code\ Powerline:h13
 end
@@ -116,6 +123,85 @@ let g:ctrlp_custom_ignore={
   \ 'dir': '\v[\/]\.(git|hg|svn)$',
   \ 'file': '\v\.(exe|so|dll)'}
 
+" omnisharp
+set splitbelow
+imap <Leader>o <C-x><C-o>
+nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
+nnoremap <leader>rl :OmniSharpReloadSolution<cr>
+nnoremap <leader>cf :OmniSharpCodeFormat<cr>
+augroup omnisharp_commands
+	autocmd!
+
+	autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+
+	autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+	autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
+	autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
+	autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
+	autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
+	autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
+	
+augroup END
+
+" Add syntax highlighting for types and interfaces
+nnoremap <leader>th :OmniSharpHighlightTypes<cr>
+
+" neocomplete
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 0
+" Use neocomplete.
+let g:neocomplete#enable_at_startup = 1
+" Don't Use smartcase.
+let g:neocomplete#enable_smart_case = 0
+let g:neocomplete#enable_auto_close_preview = 0
+" Define dictionary.
+let g:neocomplete#sources#dictionary#dictionaries = {
+    \ 'default' : '',
+    \ 'vimshell' : $HOME.'/.vimshell_hist'
+        \ }
+
+" Plugin key-mappings.
+inoremap <expr><C-g>     neocomplete#undo_completion()
+inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  "return neocomplete#close_popup() . "\<CR>"
+  " For no inserting <CR> key.
+  return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+endfunction
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><C-y>  neocomplete#close_popup()
+inoremap <expr><C-e>  neocomplete#cancel_popup()
+
+let g:neocomplete#enable_auto_select = 0
+let g:neocomplete#disable_auto_complete = 0
+
+" Enable heavy omni completion.
+
+call neocomplete#custom#source('_', 'sorters', [])
+
+if !exists('g:neocomplete#sources')
+        let g:neocomplete#sources = {}
+endif
+
+if !exists('g:neocomplete#sources#omni#input_patterns')
+  let g:neocomplete#sources#omni#input_patterns = {}
+endif
+
+let g:neocomplete#sources#omni#input_patterns.cs = '.*[^=\);]'
+let g:neocomplete#sources.cs = ['omni']
+let g:neocomplete#enable_refresh_always = 0
+let g:echodoc_enable_at_startup = 1
+
+
 " easy motion
 map <Leader>j <Plug>(easymotion-j)
 map <Leader>k <Plug>(easymotion-k)
@@ -124,7 +210,6 @@ map <C-s> <Plug>(easymotion-s)
 nmap ]c <Plug>GitGutterNextHunk
 nmap [c <Plug>GitGutterPrevHunk
 
-
 noremap <F7> :g/\s\+\w\+\s*:\s*function/p<CR>
 noremap <F2> :redir@y<CR>:g/<C-r><C-w>/p<CR>:vsplit<CR><C-W>l:enew<CR>:put! y<CR>
 
@@ -132,9 +217,8 @@ noremap <F2> :redir@y<CR>:g/<C-r><C-w>/p<CR>:vsplit<CR><C-W>l:enew<CR>:put! y<CR
 set nobackup
 set nowritebackup
 
-map <Leader>c :CtrlP $DHC<CR>
-map <Leader>s :CtrlP $DHS<CR>
-map <Leader>t :CtrlP $DHT<CR>
+map <Leader>c :CtrlP $YMC<CR>
+map <Leader>s :CtrlP $YMS<CR>
 
 function! JSON()
 	:%!python -m json.tool
