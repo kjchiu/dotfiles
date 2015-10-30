@@ -13,6 +13,7 @@ Plugin 'tpope/vim-surround'
 " file stuff
 Plugin 'tpope/vim-vinegar' " netrw wrapper
 Plugin 'kien/ctrlp.vim'
+Plugin 'rking/ag.vim'
 
 " git
 Plugin 'tpope/vim-fugitive'
@@ -106,7 +107,7 @@ silent map <Leader>sv :source ~/.vimrc<CR>
 
 nmap <Leader>bd :bd *<C-a><CR>
 
-set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp,*.*.meta,*/Temp/*
+set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp,*.*.meta,*/Temp/*,*.class
 if has('gui_running')
 	set guifont=Consolas:h14,Sauce\ Code\ Powerline:h13
 end
@@ -123,6 +124,17 @@ let g:ctrlp_custom_ignore={
   \ 'dir': '\v[\/]\.(git|hg|svn)$',
   \ 'file': '\v\.(exe|so|dll)'}
 
+if executable('ag')
+	let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden
+		  \ --ignore .git
+		  \ --ignore .svn
+		  \ --ignore .hg
+		  \ --ignore .DS_Store
+		  \ --ignore "**/*.pyc"
+		  \ --ignore "**/target/**"
+		  \ --ignore "*.meta"
+		  \ -g ""'
+endif
 " omnisharp
 set splitbelow
 imap <Leader>o <C-x><C-o>
@@ -150,6 +162,7 @@ nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
 " Use neocomplete.
+let g:neocomplete#sources#syntax#min_keyword_length = 3
 let g:neocomplete#enable_at_startup = 1
 " Don't Use smartcase.
 let g:neocomplete#enable_smart_case = 0
@@ -175,6 +188,9 @@ endfunction
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<TAB>"
+
+inoremap<expr><Space> pumvisible() ? neocomplete#close_popup()."\<SPACE>" : "\<SPACE>"
+
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
@@ -196,7 +212,7 @@ if !exists('g:neocomplete#sources#omni#input_patterns')
   let g:neocomplete#sources#omni#input_patterns = {}
 endif
 
-let g:neocomplete#sources#omni#input_patterns.cs = '.*[^=\);]'
+let g:neocomplete#sources#omni#input_patterns.cs = '[a-zA-Z0-9_]\+'
 let g:neocomplete#sources.cs = ['omni']
 let g:neocomplete#enable_refresh_always = 0
 let g:echodoc_enable_at_startup = 1
