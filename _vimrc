@@ -68,6 +68,12 @@ set incsearch
 set hlsearch
 
 " set scrolloff=30 
+" ugh yml
+au BufRead,BufNewFile *.yml setlocal ft=yaml sts=2 ts=2 sw=2 et
+map <Leader>c :CtrlP $YMC<CR>
+map <Leader>s :CtrlP $YMS<CR>
+map <Leader>t :CtrlP $YMT<CR>
+map <Leader>y :CtrlP ~/src/YoWorld/server/smartfox<CR>
 
 " macros
 
