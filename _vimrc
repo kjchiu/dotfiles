@@ -9,6 +9,8 @@ Plugin 'bling/vim-airline'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'tpope/vim-surround'
+Plugin 'dpc/vim-smarttabs'
+Plugin 'junegunn/vim-easy-align'
 
 " file stuff
 Plugin 'tpope/vim-vinegar' " netrw wrapper
@@ -20,6 +22,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 
 Plugin 'pangloss/vim-javascript'
+Plugin 'bigfish/vim-js-context-coloring'
 
 " clojure
 Plugin 'oblitum/rainbow' " rainbow parens
@@ -43,9 +46,6 @@ call vundle#end()
 filetype plugin indent on
 
 
-" ugh yml
-au BufRead,BufNewFile *.yml setlocal ft=yaml sts=2 ts=2 sw=2 et
-
 set noswapfile
 
 set nocompatible
@@ -67,13 +67,55 @@ set nowrap
 set incsearch
 set hlsearch
 
+set relativenumber
+
+
 " set scrolloff=30 
 " ugh yml
 au BufRead,BufNewFile *.yml setlocal ft=yaml sts=2 ts=2 sw=2 et
-map <Leader>c :CtrlP $YMC<CR>
-map <Leader>s :CtrlP $YMS<CR>
-map <Leader>t :CtrlP $YMT<CR>
-map <Leader>y :CtrlP ~/src/YoWorld/server/smartfox<CR>
+
+
+augroup csharp
+	autocmd FileType cs let @h="O/// <summary>\<CR>\<CR></summary>\<C-c>"
+	autocmd Filetype cs let @p="\"_yiwO/// \<C-c>\"_p"
+augroup end
+
+augroup javadoc
+	autocmd BufRead,BufNewFile *.java,*.js let @h="O/**\<CR>\<CR>/\<C-c>"
+augroup end
+
+nmap <S-Space> <Leader>
+omap <S-Space> <Leader>
+nmap <Space> :
+
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
+nmap <Leader>l :set relativenumber!<CR>
+map <Leader>c :CtrlP $PVC<CR>
+map <Leader>s :CtrlP $PVS<CR>
+map <Leader>a :CtrlP $PVA<CR>
+map <Leader>t :CtrlP $PVT<CR>
+
+" easy motion
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+
+nnoremap <Leader>d "_d
+nnoremap <Leader>p "_p
+
+nmap <Leader>w :set list!<CR>
+
+" manip vimrc
+map <Leader>ve :e ~/.vimrc<CR>
+map <Leader>vs :source ~/.vimrc<CR>
+
+nmap <Leader>bd :bd *<C-a><CR>
+nmap <Leader>x :JSContextColorToggle<CR>
+
 
 " macros
 
@@ -94,29 +136,22 @@ else
 endif
 
 let g:rainbow_active = 1
-
-nmap <S-Space> <Leader>
-omap <S-Space> <Leader>
-nmap <Space> :
-nmap <Leader>d "_d
-nmap <Leader>p "_p
-imap <C-CR> <C-o>A;<C-c>:s/\([,{]\);$/\1/e<CR>:s/;\+$/;/e<CR>o
-nmap <C-CR> A;<C-c>:s/\([,{]\);$/\1/e<CR>:s/;\+$/;/e<CR>o<C-c>
+let g:js_context_colors_enabled = 1
+let g:js_context_colors_fold = 0
 
 " toggle visible whitespace
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
-nmap <Leader>w :set list!<CR>
 
-" manip vimrc
-silent map <Leader>ev :e ~/.vimrc<CR>
-silent map <Leader>sv :source ~/.vimrc<CR>
 
-nmap <Leader>bd :bd *<C-a><CR>
 
-set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp,*.*.meta,*/Temp/*,*.class
+set wildignore+=*/node_modules/*,*/.git/*,*.so,*.swp,*.*.meta,*/Temp/*,*.class,*.*.meta
 if has('gui_running')
-	set guifont=Consolas:h14,Sauce\ Code\ Powerline:h13
+	" set guifont=Consolas:h14,Sauce\ Code\ Powerline:h13
+	set guifont=Sauce\ Code\ Powerline:h14
 end
+
+" syntastic
+let g:syntastic_check_on_open = 0 
 
 " CtrlP
 let g:ctrlp_working_path_mode = 'r'
@@ -138,6 +173,7 @@ if executable('ag')
 		  \ --ignore .DS_Store
 		  \ --ignore "**/*.pyc"
 		  \ --ignore "**/target/**"
+		  \ --ignore "*.*.meta"
 		  \ --ignore "*.meta"
 		  \ -g ""'
 endif
@@ -146,7 +182,7 @@ set splitbelow
 imap <Leader>o <C-x><C-o>
 nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
 nnoremap <leader>rl :OmniSharpReloadSolution<cr>
-nnoremap <leader>cf :OmniSharpCodeFormat<cr>
+nnoremap <leader>ff :OmniSharpCodeFormat<cr>
 augroup omnisharp_commands
 	autocmd!
 
@@ -158,6 +194,7 @@ augroup omnisharp_commands
 	autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
 	autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
 	autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
+	autocmd FileType cs nnoremap <leader>fd :OmniSharpDocumentation<cr>
 	
 augroup END
 
@@ -169,15 +206,15 @@ nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 let g:acp_enableAtStartup = 0
 " Use neocomplete.
 let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_at_startup = 0
 " Don't Use smartcase.
 let g:neocomplete#enable_smart_case = 0
 let g:neocomplete#enable_auto_close_preview = 0
 " Define dictionary.
 let g:neocomplete#sources#dictionary#dictionaries = {
-    \ 'default' : '',
-    \ 'vimshell' : $HOME.'/.vimshell_hist'
-        \ }
+	\ 'default' : '',
+	\ 'vimshell' : $HOME.'/.vimshell_hist'
+	\ }
 
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
@@ -195,7 +232,7 @@ endfunction
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<TAB>"
 
-inoremap<expr><Space> pumvisible() ? neocomplete#close_popup()."\<SPACE>" : "\<SPACE>"
+" inoremap<expr><Space> pumvisible() ? neocomplete#close_popup()."\<SPACE>" : "\<SPACE>"
 
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
@@ -224,9 +261,7 @@ let g:neocomplete#enable_refresh_always = 0
 let g:echodoc_enable_at_startup = 1
 
 
-" easy motion
-map <Leader>j <Plug>(easymotion-j)
-map <Leader>k <Plug>(easymotion-k)
+
 map <C-s> <Plug>(easymotion-s)
 
 nmap ]c <Plug>GitGutterNextHunk
@@ -238,9 +273,6 @@ noremap <F2> :redir@y<CR>:g/<C-r><C-w>/p<CR>:vsplit<CR><C-W>l:enew<CR>:put! y<CR
 " vim: set ft=vim :
 set nobackup
 set nowritebackup
-
-map <Leader>c :CtrlP $YMC<CR>
-map <Leader>s :CtrlP $YMS<CR>
 
 function! JSON()
 	:%!python -m json.tool
